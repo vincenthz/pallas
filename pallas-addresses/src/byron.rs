@@ -240,8 +240,8 @@ impl AddressPayload {
 
     // bootstrap era + no hdpayload address
     pub fn new_redeem(
-        pubkey: pallas_crypto::key::ed25519::PublicKey,
-        network_tag: Option<Vec<u8>>,
+        pubkey: &pallas_crypto::key::ed25519::PublicKey,
+        network_tag: &Option<Vec<u8>>,
     ) -> Self {
         let spending_data = SpendingData::Redeem(ByteVec::from(Vec::from(pubkey.as_ref())));
 
@@ -249,7 +249,7 @@ impl AddressPayload {
             Some(x) => vec![
                 //AddrAttrProperty::DerivationPath(ByteVec::from(vec![])),
                 //AddrAttrProperty::AddrDistr(AddrDistr::BootstrapEraDistribution),
-                AddrAttrProperty::NetworkTag(x.into()),
+                AddrAttrProperty::NetworkTag(x.clone().into()),
             ]
             .into(),
             None => vec![

@@ -1,6 +1,7 @@
 //! Parsing of Byron configuration data
 
 use pallas_addresses::ByronAddress;
+use pallas_codec::minicbor;
 use pallas_crypto::hash::Hash;
 use serde::Deserialize;
 use serde_with::serde_as;
@@ -149,11 +150,15 @@ pub fn genesis_avvm_utxos(config: &GenesisFile) -> Vec<GenesisUtxo> {
 
             let pubkey = pallas_crypto::key::ed25519::PublicKey::try_from(&pubkey[..]).unwrap();
 
-            // TODO: network tag
-            //let network_tag = Some(config.protocol_consts.protocol_magic);
-            let network_tag = None;
+            // for mainnet there is no network tag
+            let network_tag = if config.protocol_consts.protocol_magic == 764824073 {
+                None
+            } else {
+                let bytes = minicbor::to_vec(config.protocol_consts.protocol_magic).unwrap();
+                Some(bytes)
+            };
 
-            let addr = pallas_addresses::byron::AddressPayload::new_redeem(pubkey, network_tag);
+            let addr = pallas_addresses::byron::AddressPayload::new_redeem(&pubkey, &network_tag);
 
             let addr: pallas_addresses::ByronAddress = addr.into();
 
